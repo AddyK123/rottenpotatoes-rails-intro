@@ -7,7 +7,11 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    #@movies = Movie.all
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show_hash = params[:rating] || select_all_hash
+    @ratings_to_show = ratings_to_show
+    @movies = Movie.filter_by_ratings(@ratings_to_show)
   end
 
   def new
@@ -43,5 +47,13 @@ class MoviesController < ApplicationController
   # This helps make clear which methods respond to requests, and which ones do not.
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
+  end
+
+  def ratings_to_show
+    @ratings_to_show_hash&.keys
+  end
+
+  def select_all_hash
+    Hash[@all_ratings.map{|rating| [rating, "1"]}]
   end
 end
